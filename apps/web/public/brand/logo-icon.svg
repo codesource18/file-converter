@@ -1,0 +1,101 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <!-- Liquid Glass Document Gradients -->
+    <linearGradient id="docBodyGrad" x1="20" y1="15" x2="75" y2="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#39D5FF" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#2F80FF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#796BFF" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="docStrokeGrad" x1="20" y1="15" x2="80" y2="85" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#39D5FF" stop-opacity="0.7"/>
+      <stop offset="70%" stop-color="#2F80FF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#796BFF" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="foldGrad" x1="55" y1="15" x2="75" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#39D5FF" stop-opacity="0.3"/>
+    </linearGradient>
+
+    <!-- Conversion Arrows Gradients -->
+    <linearGradient id="topArrowGrad" x1="10" y1="20" x2="88" y2="35" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#39D5FF"/>
+      <stop offset="100%" stop-color="#2F80FF"/>
+    </linearGradient>
+    <linearGradient id="bottomArrowGrad" x1="90" y1="80" x2="12" y2="65" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#796BFF"/>
+      <stop offset="60%" stop-color="#2F80FF"/>
+      <stop offset="100%" stop-color="#39D5FF"/>
+    </linearGradient>
+
+    <!-- Filters for Glow & Glass Specular -->
+    <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2.5" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+    <filter id="softGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Ambient Refraction Background Glow -->
+  <circle cx="50" cy="50" r="38" fill="#2F80FF" opacity="0.12" filter="url(#softGlow)"/>
+
+  <!-- Liquid Glass Document -->
+  <g filter="url(#cyanGlow)">
+    <!-- Document Body Shape -->
+    <path d="M 30 18 L 56 18 L 72 34 L 72 82 C 72 84.5 70 86.5 67.5 86.5 L 30 86.5 C 27.5 86.5 25.5 84.5 25.5 82 L 25.5 22.5 C 25.5 20 27.5 18 30 18 Z" 
+          fill="url(#docBodyGrad)" 
+          stroke="url(#docStrokeGrad)" 
+          stroke-width="2.2" 
+          stroke-linejoin="round"/>
+
+    <!-- Document Fold Corner -->
+    <path d="M 56 18 L 56 32 C 56 33.5 57 34.5 58.5 34.5 L 72 34.5 Z" 
+          fill="url(#foldGrad)" 
+          stroke="url(#docStrokeGrad)" 
+          stroke-width="1.8" 
+          stroke-linejoin="round"/>
+
+    <!-- Document Internal Data Flow Lines -->
+    <line x1="33" y1="46" x2="63" y2="46" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="33" y1="56" x2="55" y2="56" stroke="#39D5FF" stroke-opacity="0.8" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="33" y1="66" x2="61" y2="66" stroke="#796BFF" stroke-opacity="0.75" stroke-width="2.2" stroke-linecap="round"/>
+
+    <!-- Specular Highlight Sparkle -->
+    <circle cx="33" cy="27" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+  </g>
+
+  <!-- Orbital Top Conversion Arrow (Clockwise Flow) -->
+  <g filter="url(#cyanGlow)">
+    <path d="M 16 46 C 14 30 25 15 44 11 C 55 9 66 12 75 19" 
+          stroke="url(#topArrowGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          fill="none"/>
+    <!-- Top Arrow Head pointing right -->
+    <path d="M 72 12 L 80 19 L 71 25" 
+          stroke="url(#topArrowGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+  </g>
+
+  <!-- Orbital Bottom Conversion Arrow (Counter Flow) -->
+  <g filter="url(#cyanGlow)">
+    <path d="M 84 54 C 86 70 75 85 56 89 C 45 91 34 88 25 81" 
+          stroke="url(#bottomArrowGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          fill="none"/>
+    <!-- Bottom Arrow Head pointing left -->
+    <path d="M 28 88 L 20 81 L 29 75" 
+          stroke="url(#bottomArrowGrad)" 
+          stroke-width="3.5" 
+          stroke-linecap="round" 
+          stroke-linejoin="round" 
+          fill="none"/>
+  </g>
+</svg>

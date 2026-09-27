@@ -1,0 +1,33 @@
+{
+  "name": "file-converter-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Production-ready privacy-first PDF and image conversion platform",
+  "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:all": "concurrently \"pnpm --filter web dev\" \"pnpm --filter api start\"",
+    "build": "pnpm --filter shared-types build && pnpm --filter file-detection build && pnpm --filter conversion-core build && pnpm --filter web build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "pnpm --filter web lint",
+    "typecheck": "pnpm -r exec tsc --noEmit"
+  },
+  "devDependencies": {
+    "@types/react": "^18.3.1",
+    "@types/react-dom": "^18.3.1",
+    "concurrently": "^9.1.2",
+    "pdf-lib": "^1.17.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "typescript": "^5.7.3",
+    "vitest": "^3.0.7"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "canvas",
+      "tesseract.js",
+      "@next/swc-darwin-arm64"
+    ]
+  }
+}

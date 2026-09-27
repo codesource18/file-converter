@@ -1,0 +1,9 @@
+packages:
+  - 'apps/*'
+  - 'packages/*'
+
+allowBuilds:
+  canvas: true
+  esbuild: true
+  tesseract.js: true
+  unrs-resolver: set this to true or false

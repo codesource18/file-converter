@@ -1,0 +1,77 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 80" fill="none">
+  <defs>
+    <!-- Liquid Glass Document Gradients -->
+    <linearGradient id="hDocBodyGrad" x1="16" y1="12" x2="60" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#39D5FF" stop-opacity="0.35"/>
+      <stop offset="45%" stop-color="#2F80FF" stop-opacity="0.2"/>
+      <stop offset="100%" stop-color="#796BFF" stop-opacity="0.35"/>
+    </linearGradient>
+    <linearGradient id="hDocStrokeGrad" x1="16" y1="12" x2="64" y2="68" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#39D5FF" stop-opacity="0.7"/>
+      <stop offset="70%" stop-color="#2F80FF" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#796BFF" stop-opacity="0.8"/>
+    </linearGradient>
+    <linearGradient id="hFoldGrad" x1="44" y1="12" x2="60" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#FFFFFF" stop-opacity="0.8"/>
+      <stop offset="100%" stop-color="#39D5FF" stop-opacity="0.3"/>
+    </linearGradient>
+    <linearGradient id="hTopArrowGrad" x1="8" y1="16" x2="70" y2="28" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#39D5FF"/>
+      <stop offset="100%" stop-color="#2F80FF"/>
+    </linearGradient>
+    <linearGradient id="hBottomArrowGrad" x1="72" y1="64" x2="10" y2="52" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#796BFF"/>
+      <stop offset="60%" stop-color="#2F80FF"/>
+      <stop offset="100%" stop-color="#39D5FF"/>
+    </linearGradient>
+    <linearGradient id="hTextGrad" x1="180" y1="20" x2="300" y2="60" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#39D5FF"/>
+      <stop offset="100%" stop-color="#796BFF"/>
+    </linearGradient>
+
+    <!-- Filters -->
+    <filter id="hGlow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Left Icon Group (Scaled to fit 80x80 area) -->
+  <g transform="translate(6, 0) scale(0.8)">
+    <!-- Document Body -->
+    <path d="M 30 18 L 56 18 L 72 34 L 72 82 C 72 84.5 70 86.5 67.5 86.5 L 30 86.5 C 27.5 86.5 25.5 84.5 25.5 82 L 25.5 22.5 C 25.5 20 27.5 18 30 18 Z" 
+          fill="url(#hDocBodyGrad)" 
+          stroke="url(#hDocStrokeGrad)" 
+          stroke-width="2.2" 
+          stroke-linejoin="round"/>
+
+    <!-- Document Fold -->
+    <path d="M 56 18 L 56 32 C 56 33.5 57 34.5 58.5 34.5 L 72 34.5 Z" 
+          fill="url(#hFoldGrad)" 
+          stroke="url(#hDocStrokeGrad)" 
+          stroke-width="1.8" 
+          stroke-linejoin="round"/>
+
+    <!-- Data lines -->
+    <line x1="33" y1="46" x2="63" y2="46" stroke="#FFFFFF" stroke-opacity="0.75" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="33" y1="56" x2="55" y2="56" stroke="#39D5FF" stroke-opacity="0.8" stroke-width="2.2" stroke-linecap="round"/>
+    <line x1="33" y1="66" x2="61" y2="66" stroke="#796BFF" stroke-opacity="0.75" stroke-width="2.2" stroke-linecap="round"/>
+    <circle cx="33" cy="27" r="1.5" fill="#FFFFFF" opacity="0.9"/>
+
+    <!-- Orbital Arrows -->
+    <g filter="url(#hGlow)">
+      <path d="M 16 46 C 14 30 25 15 44 11 C 55 9 66 12 75 19" 
+            stroke="url(#hTopArrowGrad)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M 72 12 L 80 19 L 71 25" 
+            stroke="url(#hTopArrowGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+      <path d="M 84 54 C 86 70 75 85 56 89 C 45 91 34 88 25 81" 
+            stroke="url(#hBottomArrowGrad)" stroke-width="3.5" stroke-linecap="round" fill="none"/>
+      <path d="M 28 88 L 20 81 L 29 75" 
+            stroke="url(#hBottomArrowGrad)" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </g>
+  </g>
+
+  <!-- Typography: File Converter -->
+  <text x="86" y="49" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Inter, sans-serif" font-size="29" font-weight="800" fill="#FFFFFF" letter-spacing="-0.02em">File<tspan fill="url(#hTextGrad)" font-weight="800">Converter</tspan></text>
+</svg>
