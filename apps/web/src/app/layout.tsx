@@ -3,6 +3,7 @@ import "./globals.css";
 import GatewayFlow from "../components/ui/gateway-flow";
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://fileconverter.app'),
   title: "File Converter — PDF & Image Tools",
   applicationName: "File Converter",
   description: "Ultra-fast, 100% private in-browser PDF and image conversion platform. Edit PDF, convert JPG, PNG, WebP, HEIC, compress with target sizes, OCR and batch processing.",

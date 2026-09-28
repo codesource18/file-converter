@@ -64,6 +64,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
         className="relative w-full aspect-[16/10] max-h-[420px] rounded-2xl overflow-hidden border border-slate-200 cursor-ew-resize bg-slate-900"
       >
         {/* Compressed / Optimized Image (Right Background) */}
+        {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic blob/data URL from client-side file upload */}
         <img
           src={compressedUrl}
           alt="Optimized"
@@ -75,6 +76,7 @@ export const BeforeAfterSlider: React.FC<BeforeAfterSliderProps> = ({
           className="absolute inset-0 overflow-hidden pointer-events-none"
           style={{ width: `${sliderPos}%` }}
         >
+          {/* eslint-disable-next-line @next/next/no-img-element -- Dynamic blob/data URL with custom slider container width */}
           <img
             src={originalUrl}
             alt="Original"

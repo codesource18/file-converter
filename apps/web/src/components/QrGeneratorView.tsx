@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import QRCode from 'qrcode';
 import { 
   QrCode, 
@@ -76,7 +76,7 @@ export const QrGeneratorView: React.FC = () => {
   const scanInputRef = useRef<HTMLInputElement>(null);
 
   // Calculate encoded QR string based on active type
-  const getQrContent = (): string => {
+  const getQrContent = useCallback((): string => {
     switch (qrType) {
       case 'url':
         return urlInput.trim() || 'https://example.com';
@@ -102,7 +102,25 @@ export const QrGeneratorView: React.FC = () => {
       default:
         return 'https://example.com';
     }
-  };
+  }, [
+    qrType,
+    urlInput,
+    textInput,
+    wifiEncryption,
+    wifiSsid,
+    wifiPassword,
+    wifiHidden,
+    emailTo,
+    emailSubject,
+    emailBody,
+    phoneMessage,
+    phoneNumber,
+    vcardName,
+    vcardOrg,
+    vcardPhone,
+    vcardEmail,
+    vcardUrl,
+  ]);
 
   // Generate QR Code data URL & SVG
   useEffect(() => {
@@ -140,27 +158,11 @@ export const QrGeneratorView: React.FC = () => {
     generateQr();
   }, [
     activeTab,
-    qrType, 
-    urlInput, 
-    textInput, 
-    wifiSsid, 
-    wifiPassword, 
-    wifiEncryption, 
-    wifiHidden,
-    emailTo, 
-    emailSubject, 
-    emailBody, 
-    phoneNumber, 
-    phoneMessage,
-    vcardName, 
-    vcardOrg, 
-    vcardPhone, 
-    vcardEmail, 
-    vcardUrl,
-    fgColor, 
-    bgColor, 
-    errorLevel, 
-    qrMargin, 
+    getQrContent,
+    fgColor,
+    bgColor,
+    errorLevel,
+    qrMargin,
     qrSize
   ]);
 
@@ -741,6 +743,7 @@ export const QrGeneratorView: React.FC = () => {
               {/* QR Render Sheet */}
               <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-inner flex items-center justify-center relative group overflow-hidden max-w-[280px] aspect-square w-full">
                 {qrDataUrl ? (
+                  // eslint-disable-next-line @next/next/no-img-element -- Dynamic in-memory generated QR code data URL
                   <img
                     src={qrDataUrl}
                     alt="Generated QR Code"

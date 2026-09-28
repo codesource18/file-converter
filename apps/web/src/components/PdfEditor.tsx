@@ -1126,6 +1126,7 @@ export const PdfEditor: React.FC = () => {
               >
                 <div className="w-full aspect-[1/1.4] bg-white/[0.06] rounded-lg shadow-inner flex flex-col items-center justify-center text-slate-400 text-xs font-serif mb-1 border border-white/10 overflow-hidden relative">
                   {pageThumbnails[pNum] ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- Dynamic in-memory PDF page canvas thumbnail data URL
                     <img src={pageThumbnails[pNum]} alt={`Page ${pNum}`} className="w-full h-full object-contain" />
                   ) : (
                     <>
@@ -1341,6 +1342,7 @@ export const PdfEditor: React.FC = () => {
                             />
                           </svg>
                         ) : (ann.type === 'image' || ann.type === 'signature') && ann.imageData ? (
+                          // eslint-disable-next-line @next/next/no-img-element -- Dynamic in-memory client signature/image annotation data URL
                           <img 
                             src={ann.imageData} 
                             alt="Annotation" 
