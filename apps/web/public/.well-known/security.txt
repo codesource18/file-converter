@@ -1,0 +1,7 @@
+# Security Policy for File Converter (https://fileconvertor.in)
+Contact: mailto:security@fileconvertor.in
+Expires: 2027-12-31T23:59:59.000Z
+Preferred-Languages: en
+Canonical: https://fileconvertor.in/.well-known/security.txt
+Policy: https://fileconvertor.in/privacy
+Acknowledgments: https://fileconvertor.in/about
