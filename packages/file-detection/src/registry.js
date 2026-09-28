@@ -1,8 +1,9 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.ALL_TOOLS = void 0;
+exports.TOOL_SLUG_ALIASES = exports.ALL_TOOLS = void 0;
 exports.getToolById = getToolById;
 exports.getToolBySlug = getToolBySlug;
+exports.getAllIndexableSlugs = getAllIndexableSlugs;
 exports.ALL_TOOLS = [
     // --- PDF Primary & Conversion Tools ---
     {
@@ -711,9 +712,33 @@ exports.ALL_TOOLS = [
         faq: []
     }
 ];
+exports.TOOL_SLUG_ALIASES = {
+    'image-to-pdf': 'jpg-to-pdf',
+    'heic-to-pdf': 'heic-to-jpg',
+    'crop-pdf': 'edit-pdf',
+    'reorder-pdf': 'merge-pdf',
+    'remove-pdf-pages': 'split-pdf',
+    'extract-pdf-pages': 'split-pdf',
+    'pdf': 'merge-pdf',
+    'image': 'jpg-to-png',
+    'convert': 'pdf-to-word',
+    'compress': 'compress-pdf'
+};
 function getToolById(id) {
     return exports.ALL_TOOLS.find(t => t.id === id);
 }
 function getToolBySlug(slug) {
-    return exports.ALL_TOOLS.find(t => t.slug === slug || t.id === slug);
+    const directMatch = exports.ALL_TOOLS.find(t => t.slug === slug || t.id === slug);
+    if (directMatch)
+        return directMatch;
+    const aliasId = exports.TOOL_SLUG_ALIASES[slug];
+    if (aliasId) {
+        return exports.ALL_TOOLS.find(t => t.id === aliasId || t.slug === aliasId);
+    }
+    return undefined;
+}
+function getAllIndexableSlugs() {
+    const toolSlugs = exports.ALL_TOOLS.map(t => t.slug);
+    const aliasSlugs = Object.keys(exports.TOOL_SLUG_ALIASES);
+    return Array.from(new Set([...toolSlugs, ...aliasSlugs]));
 }

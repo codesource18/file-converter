@@ -718,10 +718,36 @@ export const ALL_TOOLS: ToolDefinition[] = [
   }
 ];
 
+export const TOOL_SLUG_ALIASES: Record<string, string> = {
+  'image-to-pdf': 'jpg-to-pdf',
+  'heic-to-pdf': 'heic-to-jpg',
+  'crop-pdf': 'edit-pdf',
+  'reorder-pdf': 'merge-pdf',
+  'remove-pdf-pages': 'split-pdf',
+  'extract-pdf-pages': 'split-pdf',
+  'pdf': 'merge-pdf',
+  'image': 'jpg-to-png',
+  'convert': 'pdf-to-word',
+  'compress': 'compress-pdf'
+};
+
 export function getToolById(id: string): ToolDefinition | undefined {
   return ALL_TOOLS.find(t => t.id === id);
 }
 
 export function getToolBySlug(slug: string): ToolDefinition | undefined {
-  return ALL_TOOLS.find(t => t.slug === slug || t.id === slug);
+  const directMatch = ALL_TOOLS.find(t => t.slug === slug || t.id === slug);
+  if (directMatch) return directMatch;
+  const aliasId = TOOL_SLUG_ALIASES[slug];
+  if (aliasId) {
+    return ALL_TOOLS.find(t => t.id === aliasId || t.slug === aliasId);
+  }
+  return undefined;
 }
+
+export function getAllIndexableSlugs(): string[] {
+  const toolSlugs = ALL_TOOLS.map(t => t.slug);
+  const aliasSlugs = Object.keys(TOOL_SLUG_ALIASES);
+  return Array.from(new Set([...toolSlugs, ...aliasSlugs]));
+}
+

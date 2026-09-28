@@ -1,8 +1,0 @@
-# User-agent configuration for File Converter
-User-agent: *
-Allow: /
-Disallow: /api/
-Disallow: /_next/
-
-# Sitemap location
-Sitemap: https://fileconverter.app/sitemap.xml
