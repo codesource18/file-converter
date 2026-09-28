@@ -5,6 +5,17 @@ node_modules/
 # Next.js build output
 .next/
 out/
+.vercel/
+
+# Test & report artifacts
+coverage/
+test-results/
+playwright-report/
+tmp/
+temp/
+uploads/
+processing/
+output/
 
 # Monorepo build artifacts
 dist/
