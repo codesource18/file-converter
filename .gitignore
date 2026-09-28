@@ -38,10 +38,15 @@ htmlcov/
 
 # Environment Variables
 .env
-.env.local
-.env.development.local
-.env.test.local
-.env.production.local
+.env.*
+!.env.example
+
+# Certificates and Private Keys
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
 
 # Logs
 logs/
