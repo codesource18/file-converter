@@ -63,8 +63,8 @@ export const TopNav: React.FC = () => {
 
   return (
     <>
-      <header className="sticky top-0 z-50 w-full px-3 sm:px-6 py-2.5 sm:py-3 select-none">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-2 px-3 sm:px-5 py-2 rounded-2xl sm:rounded-full bg-[rgba(10,20,32,0.88)] backdrop-blur-[18px] border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
+      <header className="sticky top-0 z-50 w-full px-2.5 sm:px-6 py-2 sm:py-3 select-none box-border">
+        <div className="w-full max-w-7xl mx-auto flex items-center justify-between gap-2 px-3 sm:px-5 py-2 rounded-2xl sm:rounded-full bg-[rgba(10,20,32,0.92)] backdrop-blur-[18px] border border-white/10 shadow-[0_8px_30px_rgba(0,0,0,0.25)]">
           
           {/* Brand Logo & Name */}
           <div 
@@ -95,8 +95,8 @@ export const TopNav: React.FC = () => {
             </span>
           </div>
 
-          {/* Unified Center Navigation Items */}
-          <nav className="flex items-center gap-1 sm:gap-2">
+          {/* Desktop Center Navigation Items (Hidden on small mobile so 3-line menu never gets pushed out) */}
+          <nav className="hidden md:flex items-center gap-1 sm:gap-2">
             
             {/* Home Button */}
             <button
@@ -143,16 +143,16 @@ export const TopNav: React.FC = () => {
             {/* Mobile Search Icon Button */}
             <button
               onClick={() => setIsSearchOpen(true)}
-              className="sm:hidden w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-cyan-300 transition-colors"
+              className="sm:hidden w-8.5 h-8.5 rounded-xl flex items-center justify-center bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-cyan-300 transition-colors shrink-0"
               aria-label="Search tools"
             >
               <Search className="w-4 h-4" />
             </button>
 
-            {/* Mobile Hamburger Menu Toggle */}
+            {/* Mobile 3-Line Hamburger Menu Toggle */}
             <button
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden w-9 h-9 rounded-xl flex items-center justify-center bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-slate-200 hover:text-white transition-colors"
+              className="md:hidden w-8.5 h-8.5 rounded-xl flex items-center justify-center bg-white/[0.08] hover:bg-white/[0.14] border border-white/15 text-slate-200 hover:text-white transition-colors shrink-0"
               aria-label="Toggle navigation menu"
             >
               {isMobileMenuOpen ? <X className="w-4 h-4 text-cyan-400" /> : <Menu className="w-4 h-4" />}
