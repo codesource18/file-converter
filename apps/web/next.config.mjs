@@ -13,12 +13,11 @@ const ContentSecurityPolicy = `
   base-uri 'self';
   form-action 'self';
   frame-ancestors 'none';
-  upgrade-insecure-requests;
 `.replace(/\s{2,}/g, ' ').trim();
 
 const nextConfig = {
   reactStrictMode: true,
-  poweredByHeader: false, // Defense-in-depth: Remove X-Powered-By
+  poweredByHeader: false,
   transpilePackages: [
     '@fileconverter/shared-types',
     '@fileconverter/file-detection',
