@@ -18,11 +18,10 @@ import {
   Stamp,
   Lock,
   FileUp,
-  RefreshCw,
   Film
 } from 'lucide-react';
 import { useConverterStore } from '../store/converter-store';
-import { ALL_TOOLS, getToolById } from '@fileconverter/file-detection';
+import { ALL_TOOLS } from '@fileconverter/file-detection';
 import { ToolDefinition } from '@fileconverter/shared-types';
 
 export const PopularTools: React.FC = () => {
@@ -66,11 +65,11 @@ export const PopularTools: React.FC = () => {
 
   const getCategorySubtitle = () => {
     switch (selectedCategory) {
-      case 'pdf': return 'Merge, split, edit, compress, watermark, and convert PDF documents';
-      case 'image': return 'Convert, resize, crop, compress, and strip metadata from images';
-      case 'convert': return 'Fast, lossless transformations between all supported file formats';
-      case 'compress': return 'Reduce file sizes with target byte limits and smart optimization';
-      default: return 'Quick access to the most frequently used browser converters';
+      case 'pdf': return 'Merge, split, edit, compress, and convert PDF documents';
+      case 'image': return 'Convert, resize, crop, compress, and strip metadata';
+      case 'convert': return 'Instant transformations between all supported file formats';
+      case 'compress': return 'Reduce file sizes with target byte limits';
+      default: return 'Quick access to top browser converters';
     }
   };
 
@@ -111,7 +110,7 @@ export const PopularTools: React.FC = () => {
   };
 
   const categories = [
-    { id: 'all', label: 'All Tools' },
+    { id: 'all', label: 'All' },
     { id: 'pdf', label: 'PDF' },
     { id: 'image', label: 'Image' },
     { id: 'convert', label: 'Convert' },
@@ -119,32 +118,32 @@ export const PopularTools: React.FC = () => {
   ];
 
   return (
-    <section className="max-w-5xl mx-auto px-4 my-12 select-none">
+    <section className="max-w-5xl mx-auto px-3 sm:px-4 my-6 sm:my-10 select-none">
       
-      {/* Category Header & Liquid Filter Pills */}
-      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6 pb-4 border-b border-white/15">
+      {/* Category Header & Filter Pills */}
+      <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-3 mb-5 pb-3 border-b border-white/10">
         <div>
-          <h2 className="text-xl md:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
+          <h2 className="text-lg sm:text-2xl font-extrabold text-white tracking-tight flex items-center gap-2">
             <span>{getCategoryTitle()}</span>
-            <span className="text-xs bg-cyan-500/20 text-cyan-300 font-bold px-2.5 py-0.5 rounded-full border border-cyan-400/30">
+            <span className="text-xs bg-cyan-500/20 text-cyan-300 font-bold px-2 py-0.5 rounded-full border border-cyan-400/30">
               {filteredTools.length}
             </span>
           </h2>
-          <p className="text-xs text-slate-300 font-medium mt-1">
+          <p className="text-xs text-slate-300 font-normal mt-0.5">
             {getCategorySubtitle()}
           </p>
         </div>
 
-        {/* Liquid Glass Filter Pills */}
-        <div className="flex items-center gap-1.5 p-1.5 rounded-full bg-white/[0.08] backdrop-blur-2xl border border-white/20 shadow-glass-sm shrink-0">
+        {/* Scrollable Filter Pills on Mobile */}
+        <div className="flex items-center gap-1.5 p-1 rounded-full bg-white/[0.08] backdrop-blur-xl border border-white/15 shadow-xs overflow-x-auto no-scrollbar shrink-0 max-w-full">
           {categories.map((c) => (
             <button
               key={c.id}
               onClick={() => setSelectedCategory(c.id)}
-              className={`px-3.5 py-1 rounded-full text-xs font-semibold transition-all ${
+              className={`px-3 py-1 rounded-full text-xs font-semibold whitespace-nowrap transition-all ${
                 selectedCategory === c.id
-                  ? 'bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 shadow-xs font-bold'
-                  : 'text-slate-200 hover:text-white hover:bg-white/10'
+                  ? 'bg-cyan-500/30 border border-cyan-400/50 text-cyan-200 font-bold'
+                  : 'text-slate-300 hover:text-white hover:bg-white/10'
               }`}
             >
               {c.label}
@@ -153,34 +152,34 @@ export const PopularTools: React.FC = () => {
         </div>
       </div>
 
-      {/* Grid of Centered Liquid-Glass Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      {/* Responsive Grid: 1 col on <390px, 2 col on 390px-640px, 3 col on tablet, 4 col on desktop */}
+      <div className="grid grid-cols-1 min-[390px]:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3 sm:gap-4">
         {filteredTools.map((tool) => {
           const Icon = getToolIcon(tool.icon);
           return (
             <div
               key={tool.id}
               onClick={() => handleOpenTool(tool)}
-              className="group glass-card-tool rounded-3xl p-5 cursor-pointer flex flex-col justify-between"
+              className="group glass-card-tool rounded-2xl sm:rounded-3xl p-3.5 sm:p-4.5 cursor-pointer flex flex-col justify-between min-h-[110px] sm:min-h-[130px]"
             >
               <div>
-                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-cyan-400 to-blue-600 p-[1.5px] shadow-glass-sm mb-3.5 group-hover:scale-105 transition-transform">
-                  <div className="w-full h-full bg-slate-900/80 rounded-[14px] flex items-center justify-center text-cyan-300 group-hover:bg-cyan-500 group-hover:text-black transition-colors backdrop-blur-md">
-                    <Icon className="w-5 h-5" />
+                <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-cyan-400 to-blue-600 p-[1.5px] shadow-xs mb-2.5 group-hover:scale-105 transition-transform">
+                  <div className="w-full h-full bg-slate-950/90 rounded-[10px] flex items-center justify-center text-cyan-300 group-hover:bg-cyan-500 group-hover:text-black transition-colors">
+                    <Icon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </div>
                 </div>
 
-                <h3 className="font-bold text-white text-sm group-hover:text-cyan-300 transition-colors">
+                <h3 className="font-bold text-white text-xs sm:text-sm group-hover:text-cyan-300 transition-colors leading-tight">
                   {tool.name}
                 </h3>
-                <p className="text-xs text-slate-300 mt-1 line-clamp-2 leading-relaxed font-normal">
+                <p className="text-[11px] sm:text-xs text-slate-300 mt-1 line-clamp-2 leading-snug font-normal">
                   {tool.description}
                 </p>
               </div>
 
-              <div className="pt-3.5 mt-3 border-t border-white/10 flex items-center justify-between text-xs font-semibold text-cyan-400 group-hover:text-cyan-300">
-                <span>Launch Tool</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" />
+              <div className="pt-2.5 mt-2 border-t border-white/10 flex items-center justify-between text-[11px] sm:text-xs font-semibold text-cyan-400 group-hover:text-cyan-300">
+                <span>Launch</span>
+                <ArrowRight className="w-3 h-3 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
           );

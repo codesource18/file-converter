@@ -25,6 +25,13 @@ export const LiquidGlassBackground: React.FC = () => {
     const floatingMeshes: THREE.Object3D[] = [];
     let isVisible = true;
 
+    // Detect mobile / touch environment
+    const isMobile = typeof window !== 'undefined' && (
+      window.innerWidth < 768 ||
+      'ontouchstart' in window ||
+      navigator.maxTouchPoints > 0
+    );
+
     try {
       scene = new THREE.Scene();
       camera = new THREE.PerspectiveCamera(
@@ -37,16 +44,29 @@ export const LiquidGlassBackground: React.FC = () => {
 
       renderer = new THREE.WebGLRenderer({
         alpha: true,
-        antialias: true,
+        antialias: !isMobile, // Disable expensive antialiasing on mobile for maximum battery & performance
         powerPreference: 'high-performance'
       });
       renderer.setSize(window.innerWidth, window.innerHeight);
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
+      
+      // Adaptive pixel ratio cap (1.0 - 1.25 on mobile, up to 1.75 on desktop)
+      const maxDpr = isMobile ? 1.2 : 1.75;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, maxDpr));
       renderer.toneMapping = THREE.ACESFilmicToneMapping;
-      renderer.toneMappingExposure = 1.15;
+      renderer.toneMappingExposure = isMobile ? 1.05 : 1.15;
+      
+      // Ensure canvas never intercepts pointer or touch events
+      renderer.domElement.style.pointerEvents = 'none';
+      renderer.domElement.style.touchAction = 'none';
+      renderer.domElement.style.userSelect = 'none';
+      renderer.domElement.style.position = 'absolute';
+      renderer.domElement.style.inset = '0';
+      renderer.domElement.style.width = '100%';
+      renderer.domElement.style.height = '100%';
+      
       container.appendChild(renderer.domElement);
 
-      // --- 1. LIQUID CAUSTIC SHADER PLANE (Deep flowing blue, cyan, violet) ---
+      // --- 1. LIQUID CAUSTIC SHADER PLANE ---
       const vertexShader = `
         varying vec2 vUv;
         void main() {
@@ -55,13 +75,15 @@ export const LiquidGlassBackground: React.FC = () => {
         }
       `;
 
+      // Simplex noise shader with adaptive distortion factor
+      const distortionFactor = isMobile ? '0.22' : '0.85';
+      const speedFactor = isMobile ? '0.04' : '0.10';
+
       const fragmentShader = `
         uniform float uTime;
         uniform vec2 uResolution;
-        uniform vec2 uMouse;
         varying vec2 vUv;
 
-        // Simplex / Perlin noise helper
         vec3 mod289(vec3 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec2 mod289(vec2 x) { return x - floor(x * (1.0 / 289.0)) * 289.0; }
         vec3 permute(vec3 x) { return mod289(((x*34.0)+1.0)*x); }
@@ -92,36 +114,27 @@ export const LiquidGlassBackground: React.FC = () => {
         void main() {
           vec2 uv = vUv;
           
-          // Slow multi-layered liquid displacement
-          float t = uTime * 0.12;
-          float n1 = snoise(uv * 2.2 + vec2(t * 0.4, t * 0.3));
-          float n2 = snoise(uv * 4.0 - vec2(t * 0.2, -t * 0.5) + vec2(n1 * 0.35));
-          float n3 = snoise(uv * 1.5 + vec2(-t * 0.15, t * 0.25) + vec2(n2 * 0.25));
+          float t = uTime * ${speedFactor};
+          float n1 = snoise(uv * 2.0 + vec2(t * 0.3, t * 0.2)) * ${distortionFactor};
+          float n2 = snoise(uv * 3.5 - vec2(t * 0.15, -t * 0.3) + vec2(n1 * 0.25)) * ${distortionFactor};
+          float n3 = snoise(uv * 1.5 + vec2(-t * 0.1, t * 0.2)) * ${distortionFactor};
 
-          // Base palette: Ice Base (#EDF7FF), Sapphire (#2F80FF), Cyan (#39D5FF), Soft Violet (#8B6CFF)
-          vec3 baseColor   = vec3(0.929, 0.968, 1.0);     // #EDF7FF
-          vec3 cyanColor   = vec3(0.223, 0.835, 1.0);     // #39D5FF
-          vec3 blueColor   = vec3(0.184, 0.502, 1.0);     // #2F80FF
-          vec3 violetColor = vec3(0.545, 0.423, 1.0);     // #8B6CFF
+          // Deep Liquid Atmosphere Palette
+          vec3 baseColor   = vec3(0.02, 0.04, 0.07);    // Deep dark obsidian
+          vec3 cyanColor   = vec3(0.08, 0.42, 0.65);    // Soft luminous cyan
+          vec3 blueColor   = vec3(0.06, 0.22, 0.52);    // Deep sapphire blue
+          vec3 violetColor = vec3(0.24, 0.14, 0.48);    // Subtle mystic violet
 
-          // Mix colors based on flowing noise layers
           vec3 col = baseColor;
           
-          // Add cyan wave in upper-right
-          float cyanGlow = smoothstep(-0.2, 0.7, n1) * smoothstep(0.0, 1.1, uv.x + uv.y * 0.5);
-          col = mix(col, cyanColor, cyanGlow * 0.35);
+          float cyanGlow = smoothstep(-0.2, 0.8, n1) * smoothstep(0.0, 1.2, uv.x + uv.y * 0.4);
+          col = mix(col, cyanColor, cyanGlow * 0.32);
 
-          // Add blue depth stream in center-left
-          float blueGlow = smoothstep(-0.4, 0.8, n2) * smoothstep(1.1, 0.0, uv.x * 0.8 + uv.y * 0.4);
-          col = mix(col, blueColor, blueGlow * 0.28);
+          float blueGlow = smoothstep(-0.3, 0.9, n2) * smoothstep(1.2, 0.0, uv.x * 0.8 + uv.y * 0.4);
+          col = mix(col, blueColor, blueGlow * 0.26);
 
-          // Add soft violet caustic ribbon in lower region
-          float violetGlow = smoothstep(-0.1, 0.9, n3) * smoothstep(0.8, -0.2, uv.y);
-          col = mix(col, violetColor, violetGlow * 0.22);
-
-          // Caustic light sparkles
-          float caustic = pow(max(0.0, n1 * n2 + n3 * 0.5), 3.0);
-          col += vec3(0.9, 0.97, 1.0) * (caustic * 0.25);
+          float violetGlow = smoothstep(-0.1, 0.9, n3) * smoothstep(0.9, -0.2, uv.y);
+          col = mix(col, violetColor, violetGlow * 0.18);
 
           gl_FragColor = vec4(col, 1.0);
         }
@@ -132,8 +145,7 @@ export const LiquidGlassBackground: React.FC = () => {
         fragmentShader,
         uniforms: {
           uTime: { value: 0 },
-          uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) },
-          uMouse: { value: new THREE.Vector2(0, 0) }
+          uResolution: { value: new THREE.Vector2(window.innerWidth, window.innerHeight) }
         },
         depthWrite: false
       });
@@ -146,165 +158,101 @@ export const LiquidGlassBackground: React.FC = () => {
       scene.add(backgroundPlane);
 
       // --- 2. LIGHTING RIG ---
-      const ambientLight = new THREE.AmbientLight(0xffffff, 1.4);
+      const ambientLight = new THREE.AmbientLight(0xffffff, isMobile ? 1.0 : 1.3);
       scene.add(ambientLight);
 
-      // Cyan light top-right
-      const cyanLight = new THREE.PointLight(0x39d5ff, 4.5, 25);
+      const cyanLight = new THREE.PointLight(0x38bdf8, isMobile ? 2.5 : 4.0, 25);
       cyanLight.position.set(8, 6, 4);
       scene.add(cyanLight);
 
-      // Blue light top-left
-      const blueLight = new THREE.DirectionalLight(0x2f80ff, 3.2);
+      const blueLight = new THREE.DirectionalLight(0x3b82f6, isMobile ? 1.8 : 2.8);
       blueLight.position.set(-8, 8, 6);
       scene.add(blueLight);
 
-      // Violet light bottom-center
-      const violetLight = new THREE.PointLight(0x8b6cff, 3.8, 22);
-      violetLight.position.set(0, -6, 3);
-      scene.add(violetLight);
-
-      // Soft white front fill
-      const frontLight = new THREE.DirectionalLight(0xffffff, 1.8);
-      frontLight.position.set(0, 2, 10);
-      scene.add(frontLight);
-
-      // --- 3. PREMIUM PHYSICAL GLASS MATERIALS ---
-      const createGlassMaterial = (tintColor: number = 0xffffff, transmission: number = 0.94, opacity: number = 0.65) => {
+      // --- 3. GLASS MATERIALS & FLOATING MESHES ---
+      const createGlassMaterial = (tintColor: number = 0xffffff, transmission: number = 0.92, opacity: number = 0.6) => {
         return new THREE.MeshPhysicalMaterial({
           color: tintColor,
-          transmission: transmission,
-          opacity: opacity,
+          transmission: isMobile ? 0.7 : transmission,
+          opacity: isMobile ? 0.4 : opacity,
           transparent: true,
-          roughness: 0.08,
-          ior: 1.45,
-          reflectivity: 0.8,
-          clearcoat: 1.0,
-          clearcoatRoughness: 0.1,
-          thickness: 1.2,
-          attenuationColor: new THREE.Color(0xdbeafe),
-          attenuationDistance: 1.5
+          roughness: 0.12,
+          ior: 1.4,
+          reflectivity: 0.6,
+          clearcoat: isMobile ? 0.4 : 0.9,
+          clearcoatRoughness: 0.15,
+          thickness: 1.0,
+          attenuationColor: new THREE.Color(0x38bdf8),
+          attenuationDistance: 2.0
         });
       };
 
-      const pureGlassMat = createGlassMaterial(0xffffff, 0.95, 0.7);
-      const cyanGlassMat = createGlassMaterial(0xe0f7ff, 0.92, 0.75);
-      const blueGlassMat = createGlassMaterial(0xdbeafe, 0.90, 0.8);
-      const violetGlassMat = createGlassMaterial(0xede9fe, 0.90, 0.75);
+      const cyanGlassMat = createGlassMaterial(0x38bdf8, 0.92, 0.55);
+      const violetGlassMat = createGlassMaterial(0xa855f7, 0.90, 0.50);
 
-      // --- 4. FLOATING 3D GLASS OBJECTS ---
+      if (isMobile) {
+        // Mobile: Render only 2 subtle decorative shapes (approx. 75% reduction in objects)
+        const shape1 = new THREE.Mesh(new THREE.TorusGeometry(1.2, 0.28, 16, 32), cyanGlassMat);
+        shape1.position.set(-3.5, 3.8, -4.5);
+        shape1.rotation.set(0.6, 0.3, 0.2);
+        shape1.userData = { baseY: 3.8, rotSpeed: { x: 0.0003, y: 0.0005, z: 0.0002 }, speed: 0.4 };
+        scene.add(shape1);
+        floatingMeshes.push(shape1);
 
-      // A. Large Translucent Glass Slab (Directly behind workspace)
-      const slabGeo = new THREE.BoxGeometry(7.0, 4.8, 0.5);
-      const slabMesh = new THREE.Mesh(slabGeo, cyanGlassMat);
-      slabMesh.position.set(0.5, -0.2, -4.5);
-      slabMesh.rotation.set(0.08, -0.12, 0.02);
-      slabMesh.userData = {
-        baseY: -0.2,
-        rotSpeed: { x: 0.0004, y: 0.0006, z: 0.0003 },
-        speed: 0.6
-      };
-      scene.add(slabMesh);
-      floatingMeshes.push(slabMesh);
+        const shape2 = new THREE.Mesh(new THREE.BoxGeometry(1.8, 1.8, 0.3), violetGlassMat);
+        shape2.position.set(3.8, -3.5, -4.0);
+        shape2.rotation.set(0.3, -0.4, 0.2);
+        shape2.userData = { baseY: -3.5, rotSpeed: { x: 0.0004, y: 0.0003, z: 0.0003 }, speed: 0.5 };
+        scene.add(shape2);
+        floatingMeshes.push(shape2);
+      } else {
+        // Desktop: Richer 3D atmospheric layout
+        const slabGeo = new THREE.BoxGeometry(6.5, 4.2, 0.4);
+        const slabMesh = new THREE.Mesh(slabGeo, cyanGlassMat);
+        slabMesh.position.set(0.5, -0.2, -4.5);
+        slabMesh.rotation.set(0.06, -0.10, 0.02);
+        slabMesh.userData = { baseY: -0.2, rotSpeed: { x: 0.0003, y: 0.0004, z: 0.0002 }, speed: 0.5 };
+        scene.add(slabMesh);
+        floatingMeshes.push(slabMesh);
 
-      // B. Glass PDF Document Sheet (Upper right hero)
-      const pdfGroup = new THREE.Group();
-      const pdfSheetGeo = new THREE.BoxGeometry(2.4, 3.2, 0.12);
-      const pdfSheetMesh = new THREE.Mesh(pdfSheetGeo, pureGlassMat);
-      pdfGroup.add(pdfSheetMesh);
+        const torusMesh = new THREE.Mesh(new THREE.TorusGeometry(1.4, 0.35, 20, 40), cyanGlassMat);
+        torusMesh.position.set(-6.5, 4.2, -4.5);
+        torusMesh.rotation.set(0.9, 0.4, 0.3);
+        torusMesh.userData = { baseY: 4.2, rotSpeed: { x: 0.0008, y: 0.0012, z: 0.0006 }, speed: 0.65 };
+        scene.add(torusMesh);
+        floatingMeshes.push(torusMesh);
 
-      // Add embossed accent lines on the PDF sheet
-      const lineMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, transparent: true, opacity: 0.6 });
-      for (let i = 0; i < 4; i++) {
-        const line = new THREE.Mesh(new THREE.BoxGeometry(1.6 - i * 0.2, 0.06, 0.02), lineMat);
-        line.position.set(-0.2 + i * 0.05, 0.8 - i * 0.45, 0.07);
-        pdfGroup.add(line);
+        const photoTile = new THREE.Mesh(new THREE.BoxGeometry(2.4, 1.8, 0.15), violetGlassMat);
+        photoTile.position.set(6.8, -3.8, -3.5);
+        photoTile.rotation.set(0.2, -0.2, -0.1);
+        photoTile.userData = { baseY: -3.8, rotSpeed: { x: 0.0008, y: 0.0009, z: 0.0005 }, speed: 0.7 };
+        scene.add(photoTile);
+        floatingMeshes.push(photoTile);
+
+        const octMesh = new THREE.Mesh(new THREE.OctahedronGeometry(0.8), cyanGlassMat);
+        octMesh.position.set(4.2, 4.5, -3.8);
+        octMesh.userData = { baseY: 4.5, rotSpeed: { x: 0.001, y: 0.0015, z: 0.0008 }, speed: 0.8 };
+        scene.add(octMesh);
+        floatingMeshes.push(octMesh);
       }
 
-      pdfGroup.position.set(7.5, 3.2, -3.2);
-      pdfGroup.rotation.set(-0.15, -0.35, 0.1);
-      pdfGroup.userData = {
-        baseY: 3.2,
-        rotSpeed: { x: 0.001, y: 0.0015, z: 0.0008 },
-        speed: 0.9
-      };
-      scene.add(pdfGroup);
-      floatingMeshes.push(pdfGroup);
-
-      // C. Glass Image Photo Tile (Lower right)
-      const imageTileGeo = new THREE.BoxGeometry(2.6, 2.0, 0.16);
-      const imageTileMesh = new THREE.Mesh(imageTileGeo, violetGlassMat);
-      imageTileMesh.position.set(6.8, -4.2, -3.5);
-      imageTileMesh.rotation.set(0.2, -0.25, -0.15);
-      imageTileMesh.userData = {
-        baseY: -4.2,
-        rotSpeed: { x: 0.0012, y: 0.001, z: 0.0009 },
-        speed: 0.8
-      };
-      scene.add(imageTileMesh);
-      floatingMeshes.push(imageTileMesh);
-
-      // D. Large Beveled Glass Cube (Far left behind sidebar)
-      const leftCubeGeo = new THREE.BoxGeometry(2.5, 2.5, 2.5);
-      const leftCubeMesh = new THREE.Mesh(leftCubeGeo, blueGlassMat);
-      leftCubeMesh.position.set(-8.5, 1.2, -4.0);
-      leftCubeMesh.rotation.set(0.4, 0.5, 0.2);
-      leftCubeMesh.userData = {
-        baseY: 1.2,
-        rotSpeed: { x: 0.0015, y: 0.002, z: 0.001 },
-        speed: 0.7
-      };
-      scene.add(leftCubeMesh);
-      floatingMeshes.push(leftCubeMesh);
-
-      // E. Glass Torus Ring (Upper left)
-      const torusGeo = new THREE.TorusGeometry(1.4, 0.38, 24, 48);
-      const torusMesh = new THREE.Mesh(torusGeo, cyanGlassMat);
-      torusMesh.position.set(-6.5, 4.8, -4.8);
-      torusMesh.rotation.set(1.0, 0.4, 0.3);
-      torusMesh.userData = {
-        baseY: 4.8,
-        rotSpeed: { x: 0.001, y: 0.0018, z: 0.0012 },
-        speed: 0.75
-      };
-      scene.add(torusMesh);
-      floatingMeshes.push(torusMesh);
-
-      // F. Small Orbiting Glass Prisms & Cubes
-      const smallCubeConfigs = [
-        { geo: new THREE.BoxGeometry(1.2, 1.2, 1.2), mat: pureGlassMat, pos: [-4.2, -3.8, -3.0], speed: 1.1 },
-        { geo: new THREE.OctahedronGeometry(0.9), mat: cyanGlassMat, pos: [3.8, 5.0, -4.0], speed: 1.2 },
-        { geo: new THREE.BoxGeometry(1.0, 1.0, 1.0), mat: violetGlassMat, pos: [-2.8, 4.2, -3.5], speed: 0.95 },
-        { geo: new THREE.TorusGeometry(0.8, 0.22, 16, 32), mat: blueGlassMat, pos: [8.8, -1.0, -4.5], speed: 1.05 }
-      ];
-
-      smallCubeConfigs.forEach((cfg) => {
-        const mesh = new THREE.Mesh(cfg.geo, cfg.mat);
-        mesh.position.set(cfg.pos[0], cfg.pos[1], cfg.pos[2]);
-        mesh.rotation.set(Math.random() * Math.PI, Math.random() * Math.PI, 0);
-        mesh.userData = {
-          baseY: cfg.pos[1],
-          rotSpeed: { x: 0.002, y: 0.0025, z: 0.0015 },
-          speed: cfg.speed
-        };
-        scene.add(mesh);
-        floatingMeshes.push(mesh);
-      });
-
-      // --- 5. MOUSE PARALLAX CONTROLLER ---
+      // --- 4. POINTER / PARALLAX (Desktop only, never captures touch) ---
       let mouseX = 0;
       let mouseY = 0;
       let targetMouseX = 0;
       let targetMouseY = 0;
 
       const handleMouseMove = (e: MouseEvent) => {
-        targetMouseX = (e.clientX / window.innerWidth - 0.5) * 2.0;
-        targetMouseY = (e.clientY / window.innerHeight - 0.5) * 2.0;
+        if (isMobile) return;
+        targetMouseX = (e.clientX / window.innerWidth - 0.5) * 1.5;
+        targetMouseY = (e.clientY / window.innerHeight - 0.5) * 1.5;
       };
 
-      window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      if (!isMobile) {
+        window.addEventListener('mousemove', handleMouseMove, { passive: true });
+      }
 
-      // Handle visibility changes to save CPU/GPU cycles when user switches tabs
+      // Save GPU/CPU when tab is hidden or minimized
       const handleVisibilityChange = () => {
         isVisible = !document.hidden;
       };
@@ -320,7 +268,7 @@ export const LiquidGlassBackground: React.FC = () => {
 
       window.addEventListener('resize', handleResize);
 
-      // --- 6. 60 FPS RENDER LOOP ---
+      // --- 5. DELTA-TIME 60/90/120Hz ANIMATION LOOP ---
       const clock = new THREE.Clock();
 
       const animate = () => {
@@ -331,27 +279,24 @@ export const LiquidGlassBackground: React.FC = () => {
 
         // Update liquid shader time
         liquidMaterial.uniforms.uTime.value = elapsedTime;
-        liquidMaterial.uniforms.uMouse.value.set(mouseX, mouseY);
 
-        // Smooth parallax interpolation
-        mouseX += (targetMouseX - mouseX) * 0.04;
-        mouseY += (targetMouseY - mouseY) * 0.04;
+        if (!isMobile) {
+          // Smooth desktop parallax
+          mouseX += (targetMouseX - mouseX) * 0.03;
+          mouseY += (targetMouseY - mouseY) * 0.03;
+          camera.position.x = mouseX * 0.4;
+          camera.position.y = -mouseY * 0.3;
+          camera.lookAt(0, 0, 0);
+        }
 
-        // Camera subtle sway
-        camera.position.x = mouseX * 0.6;
-        camera.position.y = -mouseY * 0.5;
-        camera.lookAt(0, 0, 0);
-
-        // Animate floating glass meshes
+        // Animate floating glass meshes using delta time
         floatingMeshes.forEach((mesh, index) => {
-          const speed = mesh.userData.speed || 1.0;
+          const speed = mesh.userData.speed || 0.5;
           const baseY = mesh.userData.baseY || 0;
           const rot = mesh.userData.rotSpeed;
 
-          // Gentle floating sine wave
-          mesh.position.y = baseY + Math.sin(elapsedTime * 0.8 * speed + index * 1.2) * 0.25;
+          mesh.position.y = baseY + Math.sin(elapsedTime * 0.6 * speed + index * 1.5) * 0.18;
 
-          // Very slow rotation
           if (rot) {
             mesh.rotation.x += rot.x;
             mesh.rotation.y += rot.y;
@@ -366,7 +311,9 @@ export const LiquidGlassBackground: React.FC = () => {
 
       return () => {
         cancelAnimationFrame(animationFrameId);
-        window.removeEventListener('mousemove', handleMouseMove);
+        if (!isMobile) {
+          window.removeEventListener('mousemove', handleMouseMove);
+        }
         window.removeEventListener('resize', handleResize);
         document.removeEventListener('visibilitychange', handleVisibilityChange);
         if (renderer.domElement && container.contains(renderer.domElement)) {
@@ -383,10 +330,12 @@ export const LiquidGlassBackground: React.FC = () => {
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 pointer-events-none -z-10 overflow-hidden"
+      aria-hidden="true"
+      className="fixed inset-0 pointer-events-none select-none -z-10 overflow-hidden"
       style={{
+        touchAction: 'none',
         background: !webglSupported
-          ? 'radial-gradient(circle at 80% 20%, #39d5ff30 0%, #edf7ff 50%, #8b6cff20 100%)'
+          ? 'radial-gradient(circle at 50% 30%, rgba(56,189,248,0.12) 0%, rgba(0,0,0,1) 80%)'
           : 'transparent'
       }}
     />

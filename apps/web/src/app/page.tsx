@@ -1,11 +1,11 @@
 'use client';
 
-import React, { useState } from 'react';
+import React from 'react';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Sidebar } from '../components/Sidebar';
 import { TopNav } from '../components/TopNav';
 import { DropZone } from '../components/DropZone';
-import { Hero } from '../components/Hero';
 import { PopularTools } from '../components/PopularTools';
 import { PostDropView } from '../components/PostDropView';
 import { ProgressIndicator } from '../components/ProgressIndicator';
@@ -21,7 +21,7 @@ import { AdSlot } from '../components/AdSlot';
 import { useConverterStore } from '../store/converter-store';
 import { executeTool } from '../lib/tool-executor';
 import { ToolDefinition } from '@fileconverter/shared-types';
-import { AlertCircle, X, Shield } from 'lucide-react';
+import { AlertCircle, X } from 'lucide-react';
 
 export default function HomePage() {
   const {
@@ -80,28 +80,29 @@ export default function HomePage() {
 
   return (
     <div className="relative min-h-screen flex text-slate-100 selection:bg-blue-600/30 selection:text-white">
-      {/* Left Sidebar */}
-      <div className="hidden md:block">
+      {/* Desktop Left Sidebar */}
+      <div className="hidden md:block shrink-0">
         <Sidebar />
       </div>
 
       {/* Main Workspace Area */}
       <div className="flex-1 flex flex-col min-w-0 z-10">
         
-        {/* Top Navigation */}
+        {/* Unified Top Navigation */}
         <TopNav />
 
         {/* Global Error Banner */}
         {error && (
-          <div className="max-w-4xl mx-auto my-4 px-4 w-full">
-            <div className="p-4 rounded-2xl bg-red-50/90 dark:bg-red-950/80 border border-red-200 dark:border-red-800 shadow-glass-sm flex items-center justify-between text-red-800 dark:text-red-200 text-xs font-semibold backdrop-blur-md">
+          <div className="max-w-4xl mx-auto my-3 px-3 sm:px-4 w-full">
+            <div className="p-3.5 sm:p-4 rounded-2xl bg-red-950/80 border border-red-800/80 shadow-xs flex items-center justify-between text-red-200 text-xs font-semibold backdrop-blur-md">
               <div className="flex items-center gap-2">
-                <AlertCircle className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                <AlertCircle className="w-4 h-4 text-red-400 shrink-0" />
                 <span>{error}</span>
               </div>
               <button
                 onClick={() => setError(null)}
-                className="p-1 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/60 text-red-600 dark:text-red-400"
+                className="p-1 rounded-lg hover:bg-red-900/60 text-red-400"
+                aria-label="Dismiss error"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -110,7 +111,7 @@ export default function HomePage() {
         )}
 
         {/* Dynamic View Router */}
-        <main className={`flex-1 ${activeView === 'editor' ? 'flex flex-col min-h-0' : 'pb-16'}`}>
+        <main className={`flex-1 ${activeView === 'editor' ? 'flex flex-col min-h-0' : 'pb-12'}`}>
           {activeView === 'editor' ? (
             <PdfEditor />
           ) : activeView === 'batch' ? (
@@ -128,7 +129,7 @@ export default function HomePage() {
                 <>
                   <DownloadResultCard />
                   {/* Result Page Ad Slot (Min 48px whitespace from primary action buttons) */}
-                  <div className="max-w-4xl mx-auto px-4 mt-12 mb-8">
+                  <div className="max-w-4xl mx-auto px-3 sm:px-4 mt-12 mb-6">
                     <AdSlot
                       slotId="conversion-result-ad"
                       format="horizontal"
@@ -147,14 +148,13 @@ export default function HomePage() {
                 <PostDropView onExecuteTool={handleExecuteTool} />
               )}
 
-              {/* Dominant Center Drag & Drop Zone */}
+              {/* Dominant First-Viewport Drag & Drop Zone */}
               {!result && !isProcessing && !activeMetadata && (
                 <>
                   <DropZone />
-                  <Hero />
                   
-                  {/* Homepage Slot 1: Primary Horizontal Ad (Between Privacy Cards & Popular Tools) */}
-                  <div className="max-w-[970px] mx-auto px-4 mt-7 mb-8.5">
+                  {/* Homepage Slot 1: Primary Horizontal Ad (Between Dropzone & Popular Tools) */}
+                  <div className="max-w-[970px] mx-auto px-3 sm:px-4 my-4 sm:my-6">
                     <AdSlot
                       slotId="home-primary-ad"
                       format="horizontal"
@@ -169,9 +169,9 @@ export default function HomePage() {
               {/* Popular Tools Grid */}
               {!result && !activeMetadata && <PopularTools />}
 
-              {/* Homepage Slot 2: Between Popular Tools and Informative Content */}
+              {/* Homepage Slot 2: Between Popular Tools & Footer */}
               {!result && !activeMetadata && (
-                <div className="max-w-5xl mx-auto px-4 my-8">
+                <div className="max-w-5xl mx-auto px-3 sm:px-4 my-6">
                   <AdSlot
                     slotId="home-tools-ad"
                     format="horizontal"
@@ -181,39 +181,8 @@ export default function HomePage() {
                 </div>
               )}
 
-              {/* Privacy Guide & FAQ Anchor Section */}
-              <section id="privacy-guide" className="max-w-5xl mx-auto px-4 mt-12 text-center select-none">
-                <div className="p-8 rounded-3xl glass-panel-major">
-                  <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-950/60 text-blue-300 text-xs font-bold mb-3 border border-blue-800/50">
-                    <Shield className="w-3.5 h-3.5" />
-                    <span>Privacy-First Architecture</span>
-                  </div>
-                  <h3 className="text-xl font-bold text-slate-100 mb-2">
-                    How We Protect Your Sensitive Documents
-                  </h3>
-                  <p className="text-xs text-slate-400 max-w-2xl mx-auto leading-relaxed mb-6">
-                    Unlike traditional file converter websites that upload your personal contracts, photos, and scans to remote cloud servers, our engine operates directly inside your local web browser using WebAssembly and HTML5 Canvas.
-                  </p>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-left">
-                    <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 shadow-glass-sm backdrop-blur-xl">
-                      <div className="font-bold text-xs text-slate-100 mb-1">Local Memory Sandbox</div>
-                      <div className="text-[11px] text-slate-400">PDF and Image bytes are decoded into browser RAM and garbage collected immediately after download.</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 shadow-glass-sm backdrop-blur-xl">
-                      <div className="font-bold text-xs text-slate-100 mb-1">Zero Accounts or Tracking</div>
-                      <div className="text-[11px] text-slate-400">No passwords, no logins, no persistent databases storing document filenames or file content.</div>
-                    </div>
-                    <div className="p-4 rounded-2xl bg-slate-900/40 border border-white/10 shadow-glass-sm backdrop-blur-xl">
-                      <div className="font-bold text-xs text-slate-100 mb-1">Compatibility Fallback</div>
-                      <div className="text-[11px] text-slate-400">When advanced conversion requires temporary backend processing, isolated sandboxes delete files immediately after delivery.</div>
-                    </div>
-                  </div>
-                </div>
-              </section>
-
               {/* Footer Ad Slot */}
-              <div className="max-w-5xl mx-auto px-4 mt-12 mb-4">
+              <div className="max-w-5xl mx-auto px-3 sm:px-4 mt-8 mb-4">
                 <AdSlot
                   slotId="footer-ad"
                   format="horizontal"
@@ -223,17 +192,24 @@ export default function HomePage() {
               </div>
 
               {/* Footer */}
-              <footer className="mt-8 py-8 border-t border-white/10 flex flex-col items-center justify-center gap-3 text-center">
+              <footer className="mt-8 py-8 border-t border-white/10 flex flex-col items-center justify-center gap-3 text-center px-4">
                 <div className="flex items-center gap-2.5 opacity-90 hover:opacity-100 transition-opacity">
                   <Image
                     src="/brand/logo-horizontal.svg"
                     alt="File Converter"
-                    width={200}
-                    height={50}
-                    className="h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(56,189,248,0.25)]"
+                    width={180}
+                    height={45}
+                    className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(56,189,248,0.25)]"
                   />
                 </div>
-                <p className="text-xs text-slate-400">
+                <div className="flex items-center gap-4 text-xs text-slate-400">
+                  <Link href="/privacy" className="hover:text-cyan-300 transition-colors">Privacy Policy</Link>
+                  <span>&bull;</span>
+                  <Link href="/terms" className="hover:text-cyan-300 transition-colors">Terms of Service</Link>
+                  <span>&bull;</span>
+                  <Link href="/about" className="hover:text-cyan-300 transition-colors">About</Link>
+                </div>
+                <p className="text-[11px] sm:text-xs text-slate-500">
                   &copy; 2026 File Converter &bull; Your Files. Your Browser. Nothing Stored. &bull; Developed by Rynex
                 </p>
               </footer>
@@ -248,9 +224,7 @@ export default function HomePage() {
           slotId="desktop-right-rail-ad"
           format="vertical"
           minHeight={600}
-          maxWidth={300}
           className="w-full"
-          label="Advertisement"
         />
       </aside>
 

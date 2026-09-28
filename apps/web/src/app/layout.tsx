@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
-import GatewayFlow from "../components/ui/gateway-flow";
+import { LiquidGlassBackground } from "../components/LiquidGlassBackground";
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://fileconverter.app'),
@@ -61,8 +61,8 @@ export default function RootLayout({
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180" />
       </head>
       <body className="antialiased min-h-screen bg-black text-slate-100 selection:bg-blue-600/30 selection:text-white dark relative overflow-x-hidden">
-        {/* Full-screen centered live canvas background */}
-        <GatewayFlow speed={1.0} opacity={1.0} density={1.1} />
+        {/* Full-screen responsive 3D liquid background */}
+        <LiquidGlassBackground />
         {children}
       </body>
     </html>
