@@ -60,6 +60,34 @@ async def process_conversion(input_path: str, target_format: str, job_dir: str):
         cv.close()
         return output_path, output_filename, "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
 
+    # 1b. DOCX to PDF
+    if target == "PDF":
+        try:
+            import zipfile
+            import xml.etree.ElementTree as ET
+            if zipfile.is_zipfile(input_path):
+                with zipfile.ZipFile(input_path) as z:
+                    if "word/document.xml" in z.namelist():
+                        xml_content = z.read("word/document.xml")
+                        tree = ET.fromstring(xml_content)
+                        text_parts = []
+                        for node in tree.iter():
+                            if node.tag.endswith("t") and node.text:
+                                text_parts.append(node.text)
+                            elif node.tag.endswith("p"):
+                                text_parts.append("\n")
+                        doc_text = "".join(text_parts).strip() or "Word document converted to PDF"
+                        doc = fitz.open()
+                        page = doc.new_page(width=595, height=842)
+                        page.insert_text((54, 72), doc_text[:50000], fontsize=11)
+                        output_filename = "converted_document.pdf"
+                        output_path = os.path.join(job_dir, output_filename)
+                        doc.save(output_path)
+                        doc.close()
+                        return output_path, output_filename, "application/pdf"
+        except Exception:
+            pass
+
     # 2. PDF to Images or Image to Format via PyMuPDF / PIL
     try:
         with fitz.open(input_path) as doc:

@@ -90,9 +90,9 @@ export const PopularTools: React.FC = () => {
     }
     // Default popular highlight subset
     const popularIds = [
-      'edit-pdf', 'merge-pdf', 'split-pdf', 'compress-pdf',
+      'word-to-pdf', 'pdf-to-word', 'edit-pdf', 'merge-pdf', 'split-pdf', 'compress-pdf',
       'compress-image', 'resize-image', 'crop-image', 'ocr-pdf',
-      'pdf-to-word', 'pdf-to-jpg', 'jpg-to-png', 'heic-to-jpg'
+      'pdf-to-jpg', 'jpg-to-png', 'heic-to-jpg'
     ];
     return ALL_TOOLS.filter(t => popularIds.includes(t.id));
   }, [selectedCategory]);

@@ -19,8 +19,8 @@ export const DropZone: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const supportedFormats = [
-    'PDF', 'JPG', 'PNG', 'WebP', 'AVIF', 
-    'HEIC', 'TIFF', 'BMP', 'GIF', 'SVG', 'ICO'
+    'DOCX', 'PDF', 'JPG', 'PNG', 'WebP', 'AVIF', 
+    'HEIC', 'TIFF', 'BMP', 'GIF', 'SVG'
   ];
 
   const handleFiles = useCallback(async (selectedFiles: FileList | File[]) => {
@@ -87,7 +87,7 @@ export const DropZone: React.FC = () => {
         multiple
         onChange={handleInputChange}
         className="hidden"
-        accept=".pdf,.jpg,.jpeg,.png,.webp,.avif,.heic,.heif,.tiff,.tif,.bmp,.gif,.svg,.ico"
+        accept=".pdf,.docx,.doc,.docm,.dotx,.jpg,.jpeg,.png,.webp,.avif,.heic,.heif,.tiff,.tif,.bmp,.gif,.svg,.ico,.txt"
       />
 
       <div

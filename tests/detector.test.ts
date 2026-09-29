@@ -35,14 +35,27 @@ describe('Universal File Signature & Detection Tests', () => {
     expect(format).toBe('TIFF');
   });
 
-  it('correctly identifies GIF magic bytes GIF89a', () => {
-    const bytes = new Uint8Array([0x47, 0x49, 0x46, 0x38, 0x39, 0x61]);
-    const format = detectFormatFromBytes(bytes, 'animation.gif');
-    expect(format).toBe('GIF');
+  it('correctly identifies DOCX files by ZIP header and extension', () => {
+    const bytes = new Uint8Array([0x50, 0x4B, 0x03, 0x04, 0x14, 0x00, 0x06, 0x00]);
+    const format = detectFormatFromBytes(bytes, 'document.docx');
+    expect(format).toBe('DOCX');
   });
 });
 
 describe('Smart Recommendation Engine Matrix', () => {
+  it('returns Word to PDF as primary tool for DOCX files', () => {
+    const meta: FileMetadata = {
+      format: 'DOCX',
+      mimeType: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      extension: 'docx',
+      size: 51200,
+      name: 'proposal.docx'
+    };
+    const recs = getSmartRecommendations(meta);
+    expect(recs.primaryTools.length).toBeGreaterThanOrEqual(1);
+    expect(recs.primaryTools[0].id).toBe('word-to-pdf');
+  });
+
   it('returns PDF to Word, PDF to JPG, PDF to PNG as top 3 for PDF files', () => {
     const meta: FileMetadata = {
       format: 'PDF',

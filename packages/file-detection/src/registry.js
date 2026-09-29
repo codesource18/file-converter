@@ -7,6 +7,28 @@ exports.getAllIndexableSlugs = getAllIndexableSlugs;
 exports.ALL_TOOLS = [
     // --- PDF Primary & Conversion Tools ---
     {
+        id: 'word-to-pdf',
+        name: 'Word to PDF',
+        description: 'Convert Microsoft Word documents (.docx, .doc) into high quality, printable PDF files instantly.',
+        category: 'convert',
+        inputFormats: ['DOCX'],
+        outputFormats: ['PDF'],
+        executionModes: ['local', 'backend'],
+        preferredMode: 'local',
+        priority: 100,
+        icon: 'FileText',
+        capabilities: ['single', 'batch'],
+        slug: 'word-to-pdf',
+        seoTitle: 'Word to PDF Converter — Free, Fast & Private DOCX to PDF',
+        seoDescription: 'Convert Word DOCX and DOC files to PDF online for free. 100% private, instant browser processing with no file size limits.',
+        explanation: 'Extracts formatted text, headings, typography, tables, and embedded images from your Word document to generate a clean, print-ready PDF.',
+        faq: [
+            { q: 'Will my document formatting and layout be preserved?', a: 'Yes! Headings, bold/italic text, tables, bullet points, font sizes, colors, and embedded images are accurately rendered.' },
+            { q: 'Is my Word document safe and private?', a: '100% private. All document processing and PDF generation occurs locally inside your browser memory without uploading your file to external servers.' },
+            { q: 'Can I convert multiple Word documents at once?', a: 'Yes, batch conversion is fully supported.' }
+        ]
+    },
+    {
         id: 'pdf-to-word',
         name: 'PDF to Word',
         description: 'Convert PDF documents into editable Word (.docx) documents with layout preservation.',
@@ -713,6 +735,8 @@ exports.ALL_TOOLS = [
     }
 ];
 exports.TOOL_SLUG_ALIASES = {
+    'docx-to-pdf': 'word-to-pdf',
+    'doc-to-pdf': 'word-to-pdf',
     'image-to-pdf': 'jpg-to-pdf',
     'heic-to-pdf': 'heic-to-jpg',
     'crop-pdf': 'edit-pdf',

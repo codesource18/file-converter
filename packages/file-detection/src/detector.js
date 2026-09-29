@@ -63,6 +63,13 @@ function detectFormatFromBytes(bytes, filename, mimeType) {
         if (bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x01 && bytes[3] === 0x00) {
             return 'ICO';
         }
+        // ZIP / DOCX: PK.. (0x50 0x4B 0x03 0x04)
+        if (bytes[0] === 0x50 && bytes[1] === 0x4B && (bytes[2] === 0x03 || bytes[2] === 0x05 || bytes[2] === 0x07)) {
+            const ext = getExtension(filename).toLowerCase();
+            if (ext === 'docx' || ext === 'doc' || ext === 'docm' || ext === 'dotx') {
+                return 'DOCX';
+            }
+        }
         // HEIC/HEIF/AVIF: ftyp container (bytes 4..7 is 'ftyp')
         if (bytes.length >= 12 &&
             bytes[4] === 0x66 && bytes[5] === 0x74 && bytes[6] === 0x79 && bytes[7] === 0x70) {
@@ -97,7 +104,10 @@ function detectFormatFromBytes(bytes, filename, mimeType) {
         case 'bmp': return 'BMP';
         case 'svg': return 'SVG';
         case 'ico': return 'ICO';
-        case 'docx': return 'DOCX';
+        case 'docx':
+        case 'doc':
+        case 'docm':
+        case 'dotx': return 'DOCX';
         case 'txt': return 'TXT';
     }
     // Fallback to MIME
@@ -250,6 +260,14 @@ function getSmartRecommendations(metadata) {
         case 'BMP':
             primaryToolIds.push('png-to-jpg', 'png-to-webp');
             secondaryToolIds.push('compress-image', 'resize-image');
+            break;
+        case 'DOCX':
+            primaryToolIds.push('word-to-pdf');
+            secondaryToolIds.push('compress-pdf', 'ocr-pdf', 'edit-pdf', 'protect-pdf');
+            break;
+        case 'TXT':
+            primaryToolIds.push('word-to-pdf');
+            secondaryToolIds.push('ocr-pdf');
             break;
         default:
             // Fallback options

@@ -16,4 +16,5 @@ var __exportStar = (this && this.__exportStar) || function(m, exports) {
 Object.defineProperty(exports, "__esModule", { value: true });
 __exportStar(require("./image-processor.js"), exports);
 __exportStar(require("./pdf-processor.js"), exports);
+__exportStar(require("./docx-processor.js"), exports);
 __exportStar(require("./batch-processor.js"), exports);

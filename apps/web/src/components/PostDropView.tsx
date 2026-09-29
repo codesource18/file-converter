@@ -95,7 +95,7 @@ export const PostDropView: React.FC<PostDropViewProps> = ({ onExecuteTool }) => 
           <div className="flex items-center gap-4 mb-5">
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-cyan-400 via-sky-400 to-blue-600 p-[1.5px] shadow-glass-sm shrink-0">
               <div className="w-full h-full bg-slate-900/80 rounded-[14px] flex items-center justify-center backdrop-blur-md">
-                {activeMetadata.format === 'PDF' ? (
+                {activeMetadata.format === 'PDF' || activeMetadata.format === 'DOCX' ? (
                   <FileText className="w-7 h-7 text-cyan-300" />
                 ) : (
                   <ImageIcon className="w-7 h-7 text-cyan-300" />

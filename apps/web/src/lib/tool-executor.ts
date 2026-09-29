@@ -2,6 +2,7 @@ import { ToolDefinition, FileFormat, ProcessedResult } from '@fileconverter/shar
 import { 
   convertImageLocally, 
   convertImageToPdf,
+  convertDocxToPdf,
   mergePdfs, 
   splitPdf, 
   rotatePdf, 
@@ -56,6 +57,10 @@ export async function executeTool(
 
   // 2. LOCAL BROWSER FIRST PROCESSING PATH
   switch (tool.id) {
+    case 'word-to-pdf':
+    case 'docx-to-pdf':
+      return await convertDocxToPdf(file, file.name, options, onProgress);
+
     case 'pdf-to-jpg':
       return await convertImageLocally(file, file.name, { outputFormat: 'JPEG', ...options }, onProgress);
 
